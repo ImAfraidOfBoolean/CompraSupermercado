@@ -2,13 +2,14 @@ package compraSupermercado;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
     static Supermercado s = new Supermercado();
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        String nombre;
+        String nombre = "";
         int cantidad;
 
         Producto avena = new Producto("Avena", 2.21);
@@ -28,28 +29,33 @@ public class Main {
         mostrarMenu();
 
         do {
-            System.out.print("Producto: ");
-            nombre = sc.nextLine();
-            boolean existeProducto = s.findProduct(nombre);
-            if (existeProducto) {
-                System.out.print("Cantidad: ");
-                cantidad = sc.nextInt();
+            try {
+
+                System.out.print("Producto: ");
+                nombre = sc.nextLine();
+                boolean existeProducto = s.findProduct(nombre);
+                if (existeProducto) {
+                    System.out.print("Cantidad: ");
+                    cantidad = sc.nextInt();
+                    sc.nextLine();
+                    s.calcSub(nombre, cantidad);
+                } else if (nombre.equalsIgnoreCase("fin")) {
+                    PrintWriter salida = null;
+                        salida = new PrintWriter("ticket.txt");
+                        salida.print(crearTicket());
+                        salida.close();
+
+
+
+                    System.out.println("Has salido del programa");
+                } else
+                    System.out.println("No existe");
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (InputMismatchException e){
+                System.out.println("valor invalido");
                 sc.nextLine();
-                s.calcSub(nombre, cantidad);
-            } else if (nombre.equalsIgnoreCase("fin")) {
-                PrintWriter salida = null;
-                try {
-                    salida = new PrintWriter("ticket.txt");
-                    salida.print(crearTicket());
-                    salida.close();
-
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-
-                System.out.println("Has salido del programa");
-            } else
-                System.out.println("No existe");
+            }
         } while (!nombre.equalsIgnoreCase("fin"));
     }
 
@@ -58,7 +64,7 @@ public class Main {
         double total = 0;
 
         ticket.append("""
-                Producto    Precio    Cantidad    Subtotal
+                Producto    Precio    Cantidad     Subtotal
                 -------------------------------------------
                 """);
 
